@@ -1,6 +1,8 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+const isImageUrl = require('is-image-url');
+const urlExists = require('url-exists');
 
 (async () => {
 
@@ -33,10 +35,54 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
+  app.get( "/", async ( req: Request, res: Response ) => {
+    res.send("try GET /filteredimage?image_url={{}}");
   } );
   
+  app.get( "/filteredimage", async ( req: Request, res: Response, next ) => {
+    const { image_url: imageUrl } = req.query;
+
+    if(!imageUrl) {
+      return res.status(400)
+                  .send(`Image URL is required.`);
+    }
+
+    if(!isImageUrl(imageUrl)) {
+      return res.status(422)
+                  .send(`Provided URL does not refer to an image.`);
+    }
+
+    urlExists(imageUrl, function(err: any, exists: boolean) {
+      if(!exists) {
+        return res.status(400)
+                  .send(`Provided URL does not exist.`);
+      }
+      if(err) {
+        return res.status(500)
+                  .send("Server encountered an error while processing the image. Sorry :(");
+      }
+    });
+
+    let filteredPath: string = "";
+    try {
+      filteredPath = await filterImageFromURL(imageUrl);
+    } catch(e) {
+      return res.status(500)
+                  .send("Server encountered an error while processing the image. Sorry :(");
+    }
+
+    res.sendFile(filteredPath, function (err) {
+      if (err) {
+        console.log(err);
+        return res.status(500)
+                  .send("Server encountered an error while processing the image. Sorry :(");
+      }
+      else {
+        console.log('Sent: ', filteredPath);
+        deleteLocalFiles([filteredPath]);
+      }
+    });
+  } );
 
   // Start the Server
   app.listen( port, () => {

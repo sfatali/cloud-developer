@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "jimp": "^0.6.4"
+    "is-image-url": "^1.1.8",
+    "jimp": "^0.6.4",
+    "url-exists": "^1.0.3"
   }
 }
