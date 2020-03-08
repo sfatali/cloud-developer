@@ -52,35 +52,36 @@ const urlExists = require('url-exists');
                   .send(`Provided URL does not refer to an image.`);
     }
 
-    urlExists(imageUrl, function(err: any, exists: boolean) {
+    urlExists(imageUrl, async function(err: any, exists: boolean) {
       if(!exists) {
         return res.status(400)
                   .send(`Provided URL does not exist.`);
       }
+      
       if(err) {
         return res.status(500)
                   .send("Server encountered an error while processing the image. Sorry :(");
       }
-    });
 
-    let filteredPath: string = "";
-    try {
-      filteredPath = await filterImageFromURL(imageUrl);
-    } catch(e) {
-      return res.status(500)
-                  .send("Server encountered an error while processing the image. Sorry :(");
-    }
-
-    res.sendFile(filteredPath, function (err) {
-      if (err) {
-        console.log(err);
+      let filteredPath: string = "";
+      try {
+        filteredPath = await filterImageFromURL(imageUrl);
+      } catch(e) {
         return res.status(500)
-                  .send("Server encountered an error while processing the image. Sorry :(");
+                    .send("Server encountered an error while processing the image. Sorry :(");
       }
-      else {
-        console.log('Sent: ', filteredPath);
-        deleteLocalFiles([filteredPath]);
-      }
+  
+      res.sendFile(filteredPath, function (err) {
+        if (err) {
+          console.log(err);
+          return res.status(500)
+                    .send("Server encountered an error while processing the image. Sorry :(");
+        }
+        else {
+          console.log('Sent: ', filteredPath);
+          deleteLocalFiles([filteredPath]);
+        }
+      });
     });
   } );
 
