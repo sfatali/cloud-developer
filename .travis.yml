@@ -19,5 +19,6 @@ install:
   - docker-compose -f course-03/udacity-c3-deployment/docker/docker-compose-build.yaml build --parallel
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push sfatali/udacity-frontend
-  - docker push udacity-restapi-user
-  - docker push udacity-restapi-feed
+  - docker push sfatali/udacity-restapi-user
+  - docker push sfatali/udacity-restapi-
+  - docker push sfatali/reverseproxy
