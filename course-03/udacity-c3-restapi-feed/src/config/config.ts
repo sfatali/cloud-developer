@@ -1,7 +1,3 @@
-console.log("WTF is this!!!!!!")
-console.log(process.env.POSTGRES_USERNAME)
-console.log(process.env.POSTGRES_DATABASE)
-
 export const config = {
   "dev": {
     "username": process.env.POSTGRES_USERNAME,
