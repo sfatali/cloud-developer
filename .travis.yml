@@ -20,5 +20,5 @@ install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push sfatali/udacity-frontend
   - docker push sfatali/udacity-restapi-user
-  - docker push sfatali/udacity-restapi-
+  - docker push sfatali/udacity-restapi-feed
   - docker push sfatali/reverseproxy
