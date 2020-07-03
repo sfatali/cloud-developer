@@ -14,11 +14,22 @@ before_install:
   - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv ./kubectl /usr/local/bin/kubectl
+  - export version=$(date '+%s') 
 
 install:
   - docker-compose -f course-03/udacity-c3-deployment/docker/docker-compose-build.yaml build --parallel
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push sfatali/udacity-frontend
-  - docker push sfatali/udacity-restapi-user
-  - docker push sfatali/udacity-restapi-feed
-  - docker push sfatali/reverseproxy
+  - docker tag sfatali/udacity-frontend:local sfatali/udacity-frontend:$version
+  - docker tag sfatali/udacity-frontend:local sfatali/udacity-frontend:latest
+  - docker push sfatali/udacity-frontend:$version
+  - docker push sfatali/udacity-frontend:local
+  - docker push sfatali/udacity-frontend:latest
+  - docker tag sfatali/udacity-restapi-user:latest sfatali/udacity-restapi-user:$version
+  - docker push sfatali/udacity-restapi-user:$version
+  - docker push sfatali/udacity-restapi-user:latest
+  - docker tag sfatali/udacity-restapi-feed:latest sfatali/udacity-restapi-feed:$version
+  - docker push sfatali/udacity-restapi-feed:$version
+  - docker push sfatali/udacity-restapi-feed:latest
+  - docker tag sfatali/reverseproxy:latest sfatali/reverseproxy:$version
+  - docker push sfatali/reverseproxy:$version
+  - docker push sfatali/reverseproxy:latest
