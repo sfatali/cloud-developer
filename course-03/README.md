@@ -71,7 +71,7 @@ To deploy the latest version of the app:
 
 2) An automatic build in TravisCI will be triggered by the push. Check the status here: https://travis-ci.org/github/sfatali/cloud-developer
 
-3) Upon build's successful completion, app components' Docker images will be pushed here: https://hub.docker.com/u/sfatali. Find the labels of the latest images there - which are timestamps, see in the tags section (e.g. https://hub.docker.com/r/sfatali/reverseproxy/tags).
+3) Upon build's successful completion, app components' Docker images will be pushed here: https://hub.docker.com/u/sfatali. Find the labels of the latest images (which are timestamps) in the tags section (e.g. https://hub.docker.com/r/sfatali/reverseproxy/tags).
 
 4) To apply the newest version image version, use:
 
