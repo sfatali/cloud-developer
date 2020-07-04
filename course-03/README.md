@@ -51,3 +51,34 @@ Ionic CLI can build the frontend into static HTML/CSS/JavaScript files. These fi
 ionic build
 ```
 ***
+
+### Docker image names
+sfatali/udacity-restapi-feed
+sfatali/udacity-restapi-user
+sfatali/udacity-frontend
+sfatali/reverseproxy
+
+### Kubectl deployments names
+backend-feed
+backend-user
+frontend 
+reverseproxy
+
+### Deployment process
+To deploy the latest version of the app:
+
+1) Push the latest version of the master branch.
+
+2) An automatic build in TravisCI will be triggered by the push. Check the status here: https://travis-ci.org/github/sfatali/cloud-developer
+
+3) Upon build's successful completion, app components' Docker images will be pushed here: https://hub.docker.com/u/sfatali. Find the labels of the latest images there - which are timestamps, see in the tags section (e.g. https://hub.docker.com/r/sfatali/reverseproxy/tags).
+
+4) To apply the newest version image version, use:
+
+kubectl set image deployments/(name of deployment) (name of deployment)=(name of the image):(latest version of it)
+
+Example:
+kubectl set image deployments/reverseproxy reverseproxy=sfatali/reverseproxy:1593883841
+
+5) To rollback to a previously working version:
+kubectl rollout undo deployments/(name of deployment)
