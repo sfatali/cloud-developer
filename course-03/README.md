@@ -53,16 +53,16 @@ ionic build
 ***
 
 ### Docker image names
-sfatali/udacity-restapi-feed
-sfatali/udacity-restapi-user
-sfatali/udacity-frontend
-sfatali/reverseproxy
+1) sfatali/udacity-restapi-feed
+2) sfatali/udacity-restapi-user
+3) sfatali/udacity-frontend
+4) sfatali/reverseproxy
 
 ### Kubectl deployments names
-backend-feed
-backend-user
-frontend 
-reverseproxy
+1) backend-feed
+2) backend-user
+3) frontend 
+4) reverseproxy
 
 ### Deployment process
 To deploy the latest version of the app:
