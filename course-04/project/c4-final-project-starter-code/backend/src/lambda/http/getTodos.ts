@@ -1,37 +1,26 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
-import * as AWS  from 'aws-sdk'
+import { createLogger } from '../../utils/logger'
+import { getUserId } from '../utils'
+import { getTodosByUserId } from '../businessLogic/todos'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+const logger = createLogger('Get Todos')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  console.log('Get todos, Caller event', event)
-  const userId = '1'
-
-  const todos = await getTodosPerUser(userId)
+  logger.info('Get todos, caller event', event)
+  const userId = getUserId(event)
+  logger.info('User Id', userId)
+  const todos = await getTodosByUserId(userId)
 
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
       items: todos
     })
   }
-}
-
-async function getTodosPerUser(userId: string) {
-  const result = await docClient.query({
-    TableName: todosTable,
-    KeyConditionExpression: 'userId = :userId',
-    ExpressionAttributeValues: {
-      ':userId': userId
-    },
-    ScanIndexForward: false
-  }).promise()
-
-  return result.Items
 }

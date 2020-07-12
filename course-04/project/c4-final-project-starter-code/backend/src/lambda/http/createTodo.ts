@@ -1,52 +1,29 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS  from 'aws-sdk'
-import * as uuid from 'uuid'
-
+import { getUserId } from '../utils'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-import { TodoItem } from '../../models/TodoItem'
+import { createTodo } from '../businessLogic/todos'
+import { createLogger } from '../../utils/logger'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
-
-const todosTable = process.env.TODOS_TABLE
-const bucketName = process.env.ATTACHMENTS_S3_BUCKET
+const logger = createLogger('Update Todos')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const newTodo: CreateTodoRequest = JSON.parse(event.body)
+  logger.info("Create Todo Request", newTodo)
+  const userId = getUserId(event)
+  logger.info("User Id", userId)
 
-  const todoId = uuid.v4()
-  const todo = await createTodo(event, todoId);
+  const todo = await createTodo(newTodo, userId);
 
   return {
     statusCode: 201,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      newItem: todo
+      item: todo
     })
   }
-}
-
-async function createTodo(event: any, todoId: string) {
-  const newTodo: CreateTodoRequest = JSON.parse(event.body)
-
-  const newItem: TodoItem = {
-    ...newTodo,
-    todoId,
-    userId: "1",
-    createdAt: new Date().toISOString(),
-    done: false,
-    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`
-  }
-  console.log('Storing new item: ', newItem)
-
-  await docClient
-    .put({
-      TableName: todosTable,
-      Item: newItem
-    })
-    .promise()
-
-  return newItem
 }

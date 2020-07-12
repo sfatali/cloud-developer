@@ -35,6 +35,7 @@ export default class Auth {
       if (authResult && authResult.accessToken && authResult.idToken) {
         console.log('Access token: ', authResult.accessToken)
         console.log('id token: ', authResult.idToken)
+        console.log('Auth result: ', authResult)
         this.setSession(authResult);
       } else if (err) {
         this.history.replace('/');

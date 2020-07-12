@@ -1,70 +1,37 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
+import { getTodoById, deleteTodo } from '../businessLogic/todos'
+import { getUserId, todoItemNotExists, todoItemNotBelongsToUser } from '../utils'
+import { createLogger } from '../../utils/logger'
 
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
-const todoIdIndex = process.env.TODO_ID_INDEX
+const logger = createLogger('Delete Todo')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
-  console.log('Updating todo item with ID: ', todoId)
+  console.log('Todo Id: ', todoId)
+  const userId = getUserId(event)
+  logger.info("User Id", userId)
 
   const todoItemDbRecord = await getTodoById(todoId)
-  console.log("Todo item fetch result: ", todoItemDbRecord)
-  if (todoItemDbRecord.Count == 0) {
-    return {
-      statusCode: 404,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: ''
-    }
-  }
+  
+  const notExists = todoItemNotExists(todoItemDbRecord)
+  if(notExists) return notExists
 
+  console.log("Todo item fetched result: ", todoItemDbRecord.Items[0])
   const todoItem = todoItemDbRecord.Items[0]
-  /*if(todoItemDbRecord.Items[0].userId !== "1") {
-    return {
-      statusCode: 403,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: ''
-    }
-  }*/
 
-  await deleteTodo(todoItem.userId, todoItem.createdAt)
+  const notBelongsToUser = todoItemNotBelongsToUser(userId, todoItem.userId)
+  if(notBelongsToUser) return notBelongsToUser
+
+  await deleteTodo(userId, todoItem.createdAt)
 
   return {
     statusCode: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({})
   }
-}
-
-async function getTodoById(todoId: string) {
-
-  const result = await docClient.query({
-    TableName : todosTable,
-    IndexName : todoIdIndex,
-    KeyConditionExpression: 'todoId = :todoId',
-    ExpressionAttributeValues: {
-        ':todoId': todoId
-    }
-  }).promise()
-
-  return result
-}
-
-async function deleteTodo(userId: string, createdAt: string) {
-  await docClient.delete({
-    TableName: todosTable,
-    Key: {
-      userId,
-      createdAt
-    }
-  }).promise()
 }
