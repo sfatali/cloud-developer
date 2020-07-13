@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "group",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "author": {
+        "type": "string"
+      },
+      "price": {
+        "type": "string"
+      },
+      "sold": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "author",
+      "price"
+    ],
+    "additionalProperties": false
+  }
