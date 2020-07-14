@@ -64,8 +64,8 @@ It returns a new book item that looks like this:
     "name": "Book",
     "author": "Author",
     "price": "10$",
-    "attachmentUrl": "http://example.com/image.png"
-    "todoId": "123",
+    "attachmentUrl": "http://example.com/image.png",
+    "bookId": "123",
     "createdAt": "2019-07-27T20:01:45.424Z",
   }
 }
